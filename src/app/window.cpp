@@ -1,6 +1,7 @@
 #include <QHBoxLayout>
 #include <QLocale>
 #include <QPushButton>
+#include <QPainter>
 
 #include "app/quick_views/quick_view.hpp"
 #include "app/utilities/icon_engine.hpp"
@@ -8,6 +9,7 @@
 
 #include "app/window.hpp"
 
+// Constructur definition of the NavRail CLASS. Maybe not called yet? this could be the default constructor
 Dash::NavRail::NavRail()
     : group()
     , timer()
@@ -17,6 +19,9 @@ Dash::NavRail::NavRail()
     this->layout->setSpacing(0);
 }
 
+/**Constructor definition of the Body class, which houses both top and bottom bars, as well as 
+ * the stacked layout housing all the different pages
+ */
 Dash::Body::Body()
     : layout(new QVBoxLayout())
     , status_bar(new QVBoxLayout())
@@ -46,11 +51,14 @@ Dash::Dash(Arbiter &arbiter)
     , rail()
     , body()
 {
+    // Initialize the main window as a horizontal layout, meaning the first object (Navrail) will be left-0 and then the body will be added to its right.
+    // Both objects inherit their heiht from the full dash window. But get their width later idk how
     auto layout = new QHBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addLayout(this->rail.layout);
+    // Body and navrail are added to the main dash layout
+    // layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
 
     connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){
@@ -82,7 +90,7 @@ void Dash::init()
         button->setCheckable(true);
         button->setFlat(true);
         QIcon icon(new StylizedIconEngine(this->arbiter, QString(":/icons/%1.svg").arg(page->icon_name()), true));
-        this->arbiter.forge().iconize(icon, button, 32);
+        this->arbiter.forge().iconize(icon, button, 32); // Gives the icon to the button and defines its size
 
         this->rail.group.addButton(button, this->arbiter.layout().page_id(page));
         this->rail.layout->addWidget(button);
@@ -111,6 +119,7 @@ QWidget *Dash::status_bar() const
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    // Attention: Clock implemented. We just need to get the code to my layout
     auto clock = new QLabel();
     clock->setFont(this->arbiter.forge().font(10, true));
     clock->setAlignment(Qt::AlignCenter);
@@ -148,6 +157,7 @@ QWidget *Dash::control_bar() const
         quick_views->setCurrentWidget(quick_view->widget());
     });
 
+    // Stretch forces the rest of the elements to align to the right? forcing the shutdown and exit buttons to the far right
     layout->addStretch();
 
     auto dialog = new Dialog(this->arbiter, true, this->arbiter.window());
@@ -166,6 +176,8 @@ QWidget *Dash::control_bar() const
     connect(exit, &QPushButton::clicked, []{ qApp->exit(); });
 
     widget->setVisible(this->arbiter.layout().control_bar.enabled);
+
+    // Connects the event of changing the control bar enable in the settings to the set Visble function
     connect(&this->arbiter, &Arbiter::control_bar_changed, [widget](bool enabled){
         widget->setVisible(enabled);
     });
@@ -224,10 +236,16 @@ MainWindow::MainWindow(QRect geometry)
     this->stack->addWidget(dash);
     dash->init();
 
+    
     this->arbiter.system().brightness.set();
-
+    
     if (this->arbiter.layout().fullscreen.on_start)
         this->arbiter.set_fullscreen(true);
+        
+    scanlineOverlay = new QLabel(this);
+    scanlineOverlay->setGeometry(0, 0, 1600, 600);
+    scanlineOverlay->setPixmap(generateScanlines(1600, 600));
+    scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 MainWindow *MainWindow::init(QRect geometry)
@@ -243,6 +261,19 @@ void MainWindow::showEvent(QShowEvent *event)
 {
     QWidget::showEvent(event);
     this->arbiter.update();
+}
+
+QPixmap MainWindow::generateScanlines(int width, int height) {
+    QPixmap pixmap(width, height);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(QColor(0,255,255,30));
+
+    for (int y = 0; y < height; y += 4)
+    {
+        painter.drawLine(0, y, width, y);
+    }
+    return pixmap;
 }
 
 void MainWindow::set_fullscreen(Page *page)

@@ -298,7 +298,8 @@ void Session::Forge::iconize(QIcon &icon, QAbstractButton *button, uint8_t size)
 
 QFont Session::Forge::font(int size, bool mono) const
 {
-    auto name = mono ? "Titillium Web" : "Montserrat";
+    // auto name = mono ? "Titillium Web" : "Montserrat";
+    auto name = "DS-Digital";
     auto scaled = size * this->arbiter_.layout().scale;
 
     return QFont(name, scaled);
@@ -449,6 +450,7 @@ Session::Core::Core(QSettings &settings, Arbiter &arbiter)
     QFontDatabase::addApplicationFont(":/fonts/Titillium_Web/TitilliumWeb-Regular.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-LightItalic.ttf");
     QFontDatabase::addApplicationFont(":/fonts/Montserrat/Montserrat-Regular.ttf");
+    QFontDatabase::addApplicationFont(":/fonts/ds_digital/DS-DIGI.ttf");
 
     if (qApp)
         qApp->setFont(arbiter.forge().font(14));

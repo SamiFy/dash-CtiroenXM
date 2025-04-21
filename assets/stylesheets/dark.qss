@@ -1,29 +1,32 @@
 QMainWindow,
 QMainWindow > QFrame {
-    background-color: rgb(18, 18, 18);
+    background-color: rgb(0, 0, 0);
 }
 
 QWidget {
     outline: 0;
+    /* outline-color: #2cfff8; */
 }
 
 QLabel {
-    color: rgb(255, 255, 255);
+    color: #2cfff8;
+    font-family: 'DS-Digital';
+    font-size: 24pt;
 }
 
 QLabel:disabled {
-    color: rgba(255, 255, 255, 128);
+    color: rgba(44, 255, 248, 128);
 }
 
 QTabWidget::pane {
     background-color: transparent;
     border: none;
-    border-top: 2px solid rgb(66, 66, 66);
+    border-top: 2px solid rgb(7, 80, 77);
 }
 
 QTabBar::tab {
     background-color: transparent;
-    color: rgba(255, 255, 255, 179);
+    color: #2cfff8;
     margin-top: 2px;
     padding: 2px;
     border-bottom: 2px solid transparent;
@@ -80,7 +83,7 @@ QSlider::sub-page[neutral="true"] {
 }
 
 QPushButton {
-    color: rgb(255, 255, 255);
+    color: rgb(44, 255, 248);
     border: none;
     padding: 8px;
     border-radius: 8px;
@@ -118,7 +121,7 @@ QFrame[frameShape="5"][frameShadow="16"] {
 }
 
 QListWidget {
-    background-color: rgb(46, 46, 46); 
+    background-color: rgb(0, 0, 0); 
     color: rgb(255, 255, 255);
     border: 2px solid rgb(66, 66, 66);
 }
@@ -147,17 +150,17 @@ QGroupBox {
 }
 
 QCheckBox {
-    color: rgb(255, 255, 255);
+    color: #2cfff8;
     background-color: transparent;
 }
 
 QRadioButton {
-    color: rgb(255, 255, 255);
+    color: #2cfff8;
     background-color: transparent;
 }
 
 QRadioButton:disabled {
-    color: rgb(136, 136, 136);
+    color: #064946;
 }
 
 QCheckBox::indicator {
@@ -273,11 +276,11 @@ StepMeter {
 }
 
 ClimateState {
-    qproperty-color: rgb(228, 228, 228);
+    qproperty-color: #2cfff8;
 }
 
 VehicleState {
-    qproperty-base_color: rgb(228, 228, 228);
+    qproperty-base_color: #2cfff8;
     qproperty-headlight_color: #4FC3F7;
     qproperty-taillight_color: #E57373;
     qproperty-indicator_color: #FFB74D;
@@ -286,19 +289,19 @@ VehicleState {
 
 QDialog,
 QDialog > QFrame {
-    background-color: rgb(56, 56, 56);
+    background-color: #000000;
     border-radius: 8px;
-    border: 2px solid rgb(66, 66, 66);
+    /* border: 2px solid #2cfff8; */
 }
 
 #ControlBar {
-    background-color: rgb(48, 48, 48);
+    background-color: #000000;
     border-top-left-radius: 6px;
     border-top-right-radius: 6px;
 }
 
 #StatusBar {
-    background-color: rgba(255, 255, 255, 4);
+    background-color: #000000;
     border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-left-radius: 4px;

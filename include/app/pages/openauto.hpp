@@ -24,6 +24,8 @@
 
 #include "DashLog.hpp"
 
+#include <QGraphicsBlurEffect>
+
 class Arbiter;
 
 class OpenAutoWorker : public QObject {
@@ -104,11 +106,15 @@ class OpenAutoPage : public QStackedWidget, public Page {
         QCheckBox *button_checkbox(QString name, QString key, aasdk::proto::enums::ButtonCode::Enum code);
         QLayout *buttons_row_widget();
 
+        
         Arbiter &arbiter;
         Config *config;
     };
-
+    
     QWidget *connect_msg();
+    QGraphicsDropShadowEffect *glow;
+    QGraphicsBlurEffect *blur;
+    // QGraphicsDropShadowEffect *glow2;
 
     Config *config;
     OpenAutoFrame *frame;

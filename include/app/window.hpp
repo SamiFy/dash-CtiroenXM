@@ -7,6 +7,7 @@
 #include <QShowEvent>
 #include <QStackedLayout>
 #include <QElapsedTimer>
+#include <QTimer>
 #include <QVBoxLayout>
 #include <QWidget>
 #include <QStackedWidget>
@@ -22,18 +23,18 @@ class FullscreenToggle;
 class Dash : public QWidget {
     Q_OBJECT
 
-   public:
-    Dash(Arbiter &arbiter);
-    void init();
+    public:
+        Dash(Arbiter &arbiter);
+        void init();
 
-   private:
-    struct NavRail {
-        QButtonGroup group;
-        QElapsedTimer timer;
-        QVBoxLayout *layout;
+    private:
+        struct NavRail {
+            QButtonGroup group;
+            QElapsedTimer timer;
+            QVBoxLayout *layout;
 
-        NavRail();
-    };
+            NavRail();
+        };
 
     struct Body {
         QVBoxLayout *layout;
@@ -57,16 +58,19 @@ class Dash : public QWidget {
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
-   public:
-    MainWindow(QRect geometry);
-    void set_fullscreen(Page *page);
+    public:
+        MainWindow(QRect geometry);
+        void set_fullscreen(Page *page);
 
-   protected:
-    void showEvent(QShowEvent *event) override;
+    protected:
+        void showEvent(QShowEvent *event) override;
 
-   private:
-    Arbiter arbiter;
-    QStackedWidget *stack;
+    private:
+        Arbiter arbiter;
+        QStackedWidget *stack;
+        QLabel *scanlineOverlay;
 
-    MainWindow *init(QRect geometry);
+        QPixmap generateScanlines(int width, int height);
+
+        MainWindow *init(QRect geometry);
 };
