@@ -61,9 +61,10 @@ class MainWindow : public QMainWindow {
     public:
         MainWindow(QRect geometry);
         void set_fullscreen(Page *page);
-
-    protected:
+        
+        protected:
         void showEvent(QShowEvent *event) override;
+        void resizeEvent(QResizeEvent *event);
 
     private:
         Arbiter arbiter;

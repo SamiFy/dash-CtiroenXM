@@ -34,7 +34,7 @@ QTabBar::tab {
 
 QTabBar::tab:selected:top {
     color: palette(base);
-    border-bottom: 2px solid palette(base);
+    /* border-bottom: 2px solid palette(base); */
 }
 
 QTabBar::tab:disabled {
