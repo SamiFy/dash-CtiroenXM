@@ -4,6 +4,7 @@
 #include "app/config.hpp"
 #include "app/pages/vehicle.hpp"
 #include "app/window.hpp"
+#include "app/widgets/XMFramedWidget.hpp"
 #include "obd/conversions.hpp"
 #include "canbus/elm327.hpp"
 #include "plugins/vehicle_plugin.hpp"
@@ -423,24 +424,33 @@ QWidget *DataTab::speedo_tach_widget()
 QWidget *DataTab::engine_data_widget()
 {
     QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    // FramedWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
+    // QVBoxLayout *layout = new QVBoxLayout(widget);
+    auto* layout = new QGridLayout();
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    layout->addStretch();
-    layout->addWidget(this->coolant_temp_widget());
-    layout->addStretch();
-    layout->addWidget(Session::Forge::br());
-    layout->addStretch();
-    layout->addWidget(this->engine_load_widget());
-    layout->addStretch();
+    // layout->addStretch();
+    // layout->addWidget(this->coolant_temp_widget());
+    // layout->addStretch();
+    // layout->addStretch();
+    // layout->addWidget(this->engine_load_widget());
+    // layout->addStretch();
+
+    layout->addWidget(this->coolant_temp_widget(), 0, 0);
+    layout->addWidget(this->engine_load_widget(), 1, 0);
+
+    layout->setRowStretch(0, 1);
+    layout->setRowStretch(1, 1);
+
+    widget->setLayout(layout);
 
     return widget;
 }
 
 QWidget *DataTab::coolant_temp_widget()
 {
-    QWidget *widget = new QWidget(this);
+    QWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -470,7 +480,8 @@ QWidget *DataTab::coolant_temp_widget()
 
 QWidget *DataTab::engine_load_widget()
 {
-    QWidget *widget = new QWidget(this);
+    // QWidget *widget = new QWidget(this);
+    QWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
