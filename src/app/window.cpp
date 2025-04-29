@@ -242,10 +242,10 @@ MainWindow::MainWindow(QRect geometry)
     if (this->arbiter.layout().fullscreen.on_start)
         this->arbiter.set_fullscreen(true);
         
-    scanlineOverlay = new QLabel(this);
-    scanlineOverlay->setGeometry(0, 0, 1600, 600);
-    scanlineOverlay->setPixmap(generateScanlines(1600, 600));
-    scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    // scanlineOverlay = new QLabel(this);
+    // scanlineOverlay->setGeometry(0, 0, 1600, 600);
+    // scanlineOverlay->setPixmap(generateScanlines(1600, 600));
+    // scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
 }
 
 MainWindow *MainWindow::init(QRect geometry)

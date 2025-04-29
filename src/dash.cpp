@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
 
     QSize size = dash.primaryScreen()->size();
     QPoint pos = dash.primaryScreen()->geometry().topLeft();
-    bool fullscreen = false;
+    bool fullscreen = true;
 
     QSettings settings;
     DASH_LOG(info) << "loaded config: " << settings.fileName().toStdString();
@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
 
     MainWindow window(QRect(pos, size));
     window.setWindowIcon(QIcon(":/logo.png"));
-    // window.setWindowFlags(Qt::FramelessWindowHint);
-    window.setWindowFlags(Qt::Window);
+    window.setWindowFlags(Qt::FramelessWindowHint);
+    // window.setWindowFlags(Qt::Window);
     if (fullscreen)
         window.setWindowState(Qt::WindowFullScreen);
 
