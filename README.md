@@ -19,6 +19,31 @@ Main features of Dash include:
 
 ![](docs/imgs/opendash-ui.gif)
 
+# TODO V0.1:
+
+- [ ] Wire up Razor USB Audio
+- [x] re-Implement Shutdown Button inside OpenDash // Done through disabling fullscreen
+- [ ] Wire up 12V from Climate Controls to board using shoes
+- [ ] Wire up Display power
+- [ ] Fix housing fitting in
+- [ ] Make housing clips
+
+# TODO V1.0:
+
+- [ ] Backend: Analyze CAN receive functions
+- [ ] Backend: Setup ESP32 Comms over UART/USB
+- [ ] Frontend: Improve global theming for a single color config
+- [ ] Fix: Disable scan lines in the AA page when it's active
+- [ ] Fix:  
+- [ ] Enhancement: Create Car driving animation
+- [ ] Enhancement: 
+- [ ] Hardware: Implement Wheel speed sensor reading circuit  
+- [ ] Hardware: Add DS1820b Temp propes
+- [ ] Hardware: Implement automatic startup and shutdown w/ ESP32 detection 
+- [ ] Hardware: Add Relay for power 
+- [ ] Hardware: Wire up USB sound to amplifier 
+- [ ] Hardware: Wire up USB microphone 
+
 # Getting Started
 
 ## Video walk through
