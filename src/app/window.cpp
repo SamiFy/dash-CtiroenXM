@@ -59,7 +59,7 @@ Dash::Dash(Arbiter &arbiter)
     layout->setSpacing(0);
 
     // Body and navrail are added to the main dash layout
-    // layout->addLayout(this->rail.layout);
+    layout->addLayout(this->rail.layout);
     layout->addLayout(this->body.layout);
 
     connect(&this->rail.group, QOverload<int>::of(&QButtonGroup::buttonPressed), [this](int id){

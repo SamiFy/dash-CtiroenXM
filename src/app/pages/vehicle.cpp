@@ -150,7 +150,7 @@ void VehiclePage::init()
     this->load_plugin();
 }
 
-QWidget *VehiclePage::dialog_body()
+QWidget *VehiclePage::dialog_body() 
 {
     QWidget *widget = new QWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
@@ -332,25 +332,48 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    auto* layout = new QGridLayout(this);
+    layout->setSpacing(10);
+    layout->setContentsMargins(10,10,10,10);
 
-    QWidget *driving_data = this->speedo_tach_widget();
-    layout->addWidget(driving_data);
-    layout->addWidget(Session::Forge::br(true));
+    QWidget *AndroidAuto_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QWidget *ClimateControls_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QWidget *Drive_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QWidget *Player_Widget = new FramedWidget(QColor(0, 255, 255), this);
 
-    QWidget *engine_data = this->engine_data_widget();
-    layout->addWidget(engine_data);
+    layout->addWidget(AndroidAuto_Widget, 0, 0);
+    layout->addWidget(ClimateControls_Widget, 1, 0);
+    layout->addWidget(Drive_Widget, 0, 1, 2, 3); // Spans from 0,1 by 2 across y and x
+    layout->addWidget(Player_Widget, 0, 4, 2, 1);
+    
 
-    QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp_left.setHorizontalStretch(5);
-    driving_data->setSizePolicy(sp_left);
-    QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
-    sp_right.setHorizontalStretch(2);
-    engine_data->setSizePolicy(sp_right);
-    for (auto &gauge : this->gauges)
-        gauge->start();
+    // layout->setColumnStretch(0, 1);
+    // layout->setColumnStretch(1, 2);
+    // layout->setColumnStretch(2, 1);
+
+
+    // --- Old DataTab layout implementation --- //
+
+    // QHBoxLayout *layout = new QHBoxLayout(this);
+
+    // QWidget *driving_data = this->speedo_tach_widget();
+    // layout->addWidget(driving_data);
+    // layout->addWidget(Session::Forge::br(true));
+
+    // QWidget *engine_data = this->engine_data_widget();
+    // layout->addWidget(engine_data);
+
+    // QSizePolicy sp_left(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // sp_left.setHorizontalStretch(5);
+    // driving_data->setSizePolicy(sp_left);
+    // QSizePolicy sp_right(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // sp_right.setHorizontalStretch(2);
+    // engine_data->setSizePolicy(sp_right);
+    // for (auto &gauge : this->gauges)
+    //     gauge->start();
 }
 
+// middle widget contains speed and tacho informaion
 QWidget *DataTab::speedo_tach_widget()
 {
     QWidget *widget = new QWidget(this);
@@ -421,6 +444,7 @@ QWidget *DataTab::speedo_tach_widget()
 //     return widget;
 // }
 
+// Contains Coolant temp and engine load widgets
 QWidget *DataTab::engine_data_widget()
 {
     QWidget *widget = new QWidget(this);

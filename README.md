@@ -21,12 +21,12 @@ Main features of Dash include:
 
 # TODO V0.1:
 
-- [ ] Wire up Razor USB Audio
+- [x] Wire up Razor USB Audio
 - [x] re-Implement Shutdown Button inside OpenDash // Done through disabling fullscreen
-- [ ] Wire up 12V from Climate Controls to board using shoes
-- [ ] Wire up Display power
-- [ ] Fix housing fitting in
-- [ ] Make housing clips
+- [x] Wire up 12V from Climate Controls to board using shoes
+- [x] Wire up Display power
+- [x] Fix housing fitting in
+- [x] Make housing clips
 
 # TODO V1.0:
 
@@ -34,8 +34,17 @@ Main features of Dash include:
 - [ ] Backend: Setup ESP32 Comms over UART/USB
 - [ ] Frontend: Improve global theming for a single color config
 - [ ] Fix: Disable scan lines in the AA page when it's active
-- [ ] Fix:  
+- [ ] Fix: Disable cursor by default on RPI5
 - [ ] Enhancement: Create Car driving animation
+    - [ ] Get Car rear view SVG or png
+    - [ ] Create while loop function, that moves the png or body element of the svg up and down
+    - [ ] Alternativly: Move wheels up and down while moving entire image up and down in opposite directions => Car bumping
+    - [ ] Create road side SVG
+    - [ ] Recolor RPM and speed Boxes depending on the read or simulated speed and rpm data
+    - [ ] Create PRNDS boxes with highlight function
+    - [ ] Edit main speed Gauge's style
+- [ ] Enhancement: Create grid layout in Vehicle page
+- [ ] Enhancement: Create new sub-pages for the main grid layout (Drive, AndroidAuto, Musicplayer, AC controls)
 - [ ] Enhancement: 
 - [ ] Hardware: Implement Wheel speed sensor reading circuit  
 - [ ] Hardware: Add DS1820b Temp propes
