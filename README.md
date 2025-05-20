@@ -35,6 +35,7 @@ Main features of Dash include:
 - [ ] Frontend: Improve global theming for a single color config
 - [ ] Fix: Disable scan lines in the AA page when it's active
 - [ ] Fix: Disable cursor by default on RPI5
+- [ ] Fix: Fix Camera resolution
 - [ ] Enhancement: Create Car driving animation
     - [ ] Get Car rear view SVG or png
     - [ ] Create while loop function, that moves the png or body element of the svg up and down
@@ -52,6 +53,37 @@ Main features of Dash include:
 - [ ] Hardware: Add Relay for power 
 - [ ] Hardware: Wire up USB sound to amplifier 
 - [ ] Hardware: Wire up USB microphone 
+
+## Cameras
+
+A rear camera is necessary for parking especially in NRW. A PAL video camera is technically the most straight forward and cheapest approach. However the quality is quite ass and I have very limited access to camera image. However, the analog camera is easiest to install with the current long distance needed.
+
+### Servaillance
+
+#### General
+
+A single reverse camera is not enough for a complete sentry mode. At least 4 camera should be positioned in all directions for a full coverage. A GoPro-like quality won't be nessisary, as it will increase the complexity, price and powerdraw significantly with very rare use cases. 
+Best approach seems to be ESP EYE cameras, AKA OV5680 or whatever cameras with an ESP32 each. This will allow easy control and seperation, low cost, and the ESP32 nodes could serve other purposes as well having two cores and some pins.
+
+This setup will allow a complete dash cam experience, as well as live outside monitoring in sentry mode. 
+
+Only unanswered challange would be data transmission. WiFi should be tested more thoroughly, though it still should be better using a more rubost wired transmission. 
+
+#### ESP CAM over WiFi
+
+USB should be considered, with a theoretical speed of 12MBit/s.
+UDP can theoretically reach up to 100Mbps bit realistically max out around 20Mbps, which is still better than USB, and requires no cables.
+
+As planned before, ESP32 nodes in the car will communicate over ESP-NOW. So low power and instant low bit rate communication for commands and sensor readings. 
+
+At the same time, a single ESP32 Cam could be able to run human detection and decide when to record or broadcast the live video to the interior, depending on wether I'm inside or not. 
+Alternatively, a motion sensor can be paired with the camera module, allowing for more reliable, efficient, and easy to implement presence detection.
+
+Note: Home Assistant could be used to receive video stream. 
+
+#### OV5460 over usb 
+
+Technically it should be possible to serialize OV5460 stream over USB 2.0 to achieve a much smoother video. However a ready to buy solution, while also being cheap and or easy to implement has no been found yet.
 
 # Getting Started
 

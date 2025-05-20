@@ -51,6 +51,7 @@ Thumbs.db
 .project
 .settings
 .vscode
+.cache
 
 # Custom #
 ##########

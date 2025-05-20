@@ -243,14 +243,14 @@ MainWindow::MainWindow(QRect geometry)
     if (this->arbiter.layout().fullscreen.on_start)
         this->arbiter.set_fullscreen(true);
         
-    scanlineOverlay = new QLabel(this);
-    scanlineOverlay->setGeometry(0, 0, width(), height());
-    scanlineOverlay->setPixmap(generateScanlines(width(), height()));
-    scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
-    scanlineOverlay->setStyleSheet("background: transparent;");
-    scanlineOverlay->setAlignment(Qt::AlignCenter);  // optional, cleaner
-    scanlineOverlay->raise();  // important: bring it to front!
+    // scanlineOverlay = new QLabel(this);
+    // scanlineOverlay->setGeometry(0, 0, width(), height());
+    // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
+    // scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    // scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
+    // scanlineOverlay->setStyleSheet("background: transparent;");
+    // scanlineOverlay->setAlignment(Qt::AlignCenter);  // optional, cleaner
+    // scanlineOverlay->raise();  // important: bring it to front!
 }
 
 MainWindow *MainWindow::init(QRect geometry)
@@ -271,8 +271,8 @@ void MainWindow::showEvent(QShowEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    scanlineOverlay->setGeometry(0, 0, width(), height());
-    scanlineOverlay->setPixmap(generateScanlines(width(), height()));
+    // scanlineOverlay->setGeometry(0, 0, width(), height());
+    // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
 }
 
 QPixmap MainWindow::generateScanlines(int width, int height) {

@@ -585,9 +585,9 @@ void CameraPage::connect_local_stream()
 
     DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with " << this->config->get_cam_local_device().toStdString();
     std::string pipeline = "v4l2src device=" + this->config->get_cam_local_device().toStdString() +
-                           " ! image/jpeg, width=640, height=480, framerate=30/1 ! jpegdec ! decodebin";
-                        //    " ! capsfilter caps=\"video/x-raw,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + ";image/jpeg,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + "\"" +
-                        //    " ! decodebin";
+                        //    " ! image/jpeg, width=480, height=320, framerate=30/1 ! jpegdec ! decodebin";
+                           " ! capsfilter caps=\"video/x-raw,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + ";image/jpeg,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + "\"" +
+                           " ! decodebin";
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
     emit connected_local();
@@ -654,11 +654,19 @@ QSize CameraPage::choose_video_resolution()
     for (auto const &resolution : imageCapture.supportedResolutions()) {
         xgap = window_size.width() - resolution.width();
         ygap = window_size.height() - resolution.height();
-        if (xgap >= 0 && ygap >= 0 && xgap + ygap < min_gap) {
-            min_gap = xgap + ygap;
+        if (ygap >= 0 && ygap < min_gap) {
+            min_gap = ygap;
             max_fit = resolution;
         }
     }
+    // for (auto const &resolution : imageCapture.supportedResolutions()) {
+    //     xgap = window_size.width() - resolution.width();
+    //     ygap = window_size.height() - resolution.height();
+    //     if (xgap >= 0 && ygap >= 0 && xgap + ygap < min_gap) {
+    //         min_gap = xgap + ygap;
+    //         max_fit = resolution;
+    //     }
+    // }
     if (max_fit.isValid()) {
         qDebug() << "Local cam auto resolution" << max_fit << "to fit in" << window_size;
         this->local_cam_settings.setResolution(max_fit);

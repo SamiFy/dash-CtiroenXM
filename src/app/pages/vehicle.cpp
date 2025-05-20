@@ -332,20 +332,41 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
-    auto* layout = new QGridLayout(this);
-    layout->setSpacing(10);
-    layout->setContentsMargins(10,10,10,10);
+    QGridLayout* gridLayout = new QGridLayout(this);
+    gridLayout->setSpacing(10);
+    gridLayout->setContentsMargins(10,10,10,10);
 
     QWidget *AndroidAuto_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QWidget *ClimateControls_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QWidget *Drive_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QWidget *Player_Widget = new FramedWidget(QColor(0, 255, 255), this);
-
-    layout->addWidget(AndroidAuto_Widget, 0, 0);
-    layout->addWidget(ClimateControls_Widget, 1, 0);
-    layout->addWidget(Drive_Widget, 0, 1, 2, 3); // Spans from 0,1 by 2 across y and x
-    layout->addWidget(Player_Widget, 0, 4, 2, 1);
+    QVBoxLayout* AndroidAuto_Layout = new QVBoxLayout(AndroidAuto_Widget); 
     
+    AndroidAuto_Layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
+    
+    QWidget *ClimateControls_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QVBoxLayout* ClimateControls_Layout = new QVBoxLayout(ClimateControls_Widget); 
+    
+    ClimateControls_Layout->addWidget(new QLabel("Climate Controls"), 0, Qt::AlignCenter);
+
+    QWidget *Time_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QVBoxLayout* Time_Layout = new QVBoxLayout(Time_Widget); 
+    
+    Time_Layout->addWidget(new QLabel("14.05.2025  21:47"), 0, Qt::AlignCenter);
+    
+    QWidget *Drive_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QVBoxLayout* Drive_Layout = new QVBoxLayout(Drive_Widget); 
+    
+    Drive_Layout->addWidget(new QLabel("Drive"), 0, Qt::AlignCenter);
+    
+    QWidget *Player_Widget = new FramedWidget(QColor(0, 255, 255), this);
+    QVBoxLayout* Player_Layout = new QVBoxLayout(Player_Widget); 
+    
+    Player_Layout->addWidget(new QLabel("Media Player"), 0, Qt::AlignCenter);
+
+
+    gridLayout->addWidget(AndroidAuto_Widget, 0, 0, 9, 1);
+    gridLayout->addWidget(ClimateControls_Widget, 9, 0, 9, 1);
+    gridLayout->addWidget(Time_Widget, 18, 0, 2, 1);
+    gridLayout->addWidget(Drive_Widget, 0, 1, 20, 3);
+    gridLayout->addWidget(Player_Widget, 0, 4, 20, 1);
 
     // layout->setColumnStretch(0, 1);
     // layout->setColumnStretch(1, 2);
