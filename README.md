@@ -44,7 +44,7 @@ Main features of Dash include:
     - [ ] Recolor RPM and speed Boxes depending on the read or simulated speed and rpm data
     - [ ] Create PRNDS boxes with highlight function
     - [ ] Edit main speed Gauge's style
-- [ ] Enhancement: Create grid layout in Vehicle page
+- [x] Enhancement: Create grid layout in Vehicle page
 - [ ] Enhancement: Create new sub-pages for the main grid layout (Drive, AndroidAuto, Musicplayer, AC controls)
 - [ ] Enhancement: 
 - [ ] Hardware: Implement Wheel speed sensor reading circuit  

@@ -4,6 +4,9 @@
 #include <QtWidgets>
 #include <QPluginLoader>
 #include <QMap>
+#include <app/widgets/XMFramedWidget.hpp>
+#include <qobjectdefs.h>
+#include <qwidget.h>
 
 #include "canbus/socketcanbus.hpp"
 #include "obd/message.hpp"
@@ -73,6 +76,39 @@ class VehiclePage : public QTabWidget, public Page {
     Config *config;
 };
 
+class AndroidAutoWidget : public FramedWidget {
+    Q_OBJECT
+
+public:
+    AndroidAutoWidget(QWidget *parent = nullptr);
+
+public:
+    void updateDirection(const QString &direction, const QString &streetName);
+    void updateDistance(int distance);
+    void updateStatus(const QString &ETA, const QString remainingTime, const QString remainingDistance);
+
+private:
+    QLabel *directionLabel;
+    QLabel *distanceLabel;
+    QLabel *statusLabel;
+};
+
+class ClimateControlsWidget : public FramedWidget {
+    Q_OBJECT
+
+public:
+    ClimateControlsWidget(QWidget *parent = nullptr);
+
+public:
+    //PlaceHolders
+    void readTemperatures(float outsideTemp, float cabinTemp, float engineTemp);
+    void writeControls();
+
+private:
+    QLabel *FanRPM;
+    QLabel *setTemp;
+};
+
 class DataTab : public QWidget {
     Q_OBJECT
 
@@ -87,6 +123,11 @@ class DataTab : public QWidget {
     QWidget *coolant_temp_widget();
     QWidget *engine_load_widget();
 
+    QGridLayout *gridLayout;
+    AndroidAutoWidget *androidAutoWidget;
+    ClimateControlsWidget *climateControlsWidget;
+
     std::vector<Gauge *> gauges;
 };
+
 

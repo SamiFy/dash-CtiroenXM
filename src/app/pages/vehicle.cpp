@@ -1,5 +1,10 @@
 #include <QPalette>
 #include <QSerialPortInfo>
+#include <qboxlayout.h>
+#include <qcolor.h>
+#include <qicon.h>
+#include <qnamespace.h>
+#include <qwidget.h>
 
 #include "app/config.hpp"
 #include "app/pages/vehicle.hpp"
@@ -332,19 +337,15 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
-    QGridLayout* gridLayout = new QGridLayout(this);
+    gridLayout = new QGridLayout(this);
     gridLayout->setSpacing(10);
     gridLayout->setContentsMargins(10,10,10,10);
 
-    QWidget *AndroidAuto_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QVBoxLayout* AndroidAuto_Layout = new QVBoxLayout(AndroidAuto_Widget); 
-    
-    AndroidAuto_Layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
-    
-    QWidget *ClimateControls_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QVBoxLayout* ClimateControls_Layout = new QVBoxLayout(ClimateControls_Widget); 
-    
-    ClimateControls_Layout->addWidget(new QLabel("Climate Controls"), 0, Qt::AlignCenter);
+    androidAutoWidget = new AndroidAutoWidget(this);
+    gridLayout->addWidget(androidAutoWidget, 0, 0, 9, 1);
+
+    climateControlsWidget = new ClimateControlsWidget(this);
+    gridLayout->addWidget(climateControlsWidget, 9, 0, 9, 1);
 
     QWidget *Time_Widget = new FramedWidget(QColor(0, 255, 255), this);
     QVBoxLayout* Time_Layout = new QVBoxLayout(Time_Widget); 
@@ -362,8 +363,6 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     Player_Layout->addWidget(new QLabel("Media Player"), 0, Qt::AlignCenter);
 
 
-    gridLayout->addWidget(AndroidAuto_Widget, 0, 0, 9, 1);
-    gridLayout->addWidget(ClimateControls_Widget, 9, 0, 9, 1);
     gridLayout->addWidget(Time_Widget, 18, 0, 2, 1);
     gridLayout->addWidget(Drive_Widget, 0, 1, 20, 3);
     gridLayout->addWidget(Player_Widget, 0, 4, 20, 1);
@@ -393,6 +392,31 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     // for (auto &gauge : this->gauges)
     //     gauge->start();
 }
+
+AndroidAutoWidget::AndroidAutoWidget(QWidget *parent)
+    : FramedWidget(QColor(0, 255,255), parent)
+{
+    QVBoxLayout* layout = new QVBoxLayout(this); 
+    
+    layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
+
+    directionLabel = new QLabel("Next Turn: [Direction] on [Street Name]");
+    directionLabel->setAlignment(Qt::AlignLeft);
+    layout->addWidget(directionLabel);
+
+    distanceLabel = new QLabel("Distance to Next Turn: [Distance] meters");
+    distanceLabel->setAlignment(Qt::AlignLeft);
+    layout->addWidget(distanceLabel);
+}
+
+ClimateControlsWidget::ClimateControlsWidget(QWidget *parent)
+    : FramedWidget(QColor(0,255,255), parent)
+{
+    QVBoxLayout* layout = new QVBoxLayout(this);
+
+    layout->addWidget(new QLabel("Climate Controls"), 0, Qt::AlignCenter);
+}
+    
 
 // middle widget contains speed and tacho informaion
 QWidget *DataTab::speedo_tach_widget()

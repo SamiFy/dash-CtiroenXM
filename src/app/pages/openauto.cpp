@@ -469,15 +469,8 @@ QWidget *OpenAutoPage::connect_msg()
     glow->setBlurRadius(100);
     glow->setOffset(0, 0);
     glow->setColor(QColor(0, 255, 255, 255));
-    // glow2 = new QGraphicsDropShadowEffect();
-    // glow2->setBlurRadius(20);
-    // glow2->setOffset(0, 0);
-    // glow2->setColor(QColor(0, 255, 255, 255));
 
     label->setGraphicsEffect(glow);
-    // label->setGraphicsEffect(glow2);
-
-    // => Trying to layer glow effects only enables the last one. No good
 
     QHBoxLayout *layout2 = new QHBoxLayout();
     layout2->setContentsMargins(0, 0, 0, 0);
