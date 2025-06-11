@@ -3,6 +3,7 @@
 #include <qboxlayout.h>
 #include <qcolor.h>
 #include <qicon.h>
+#include <qlabel.h>
 #include <qnamespace.h>
 #include <qwidget.h>
 
@@ -116,6 +117,7 @@ VehiclePage::VehiclePage(Arbiter &arbiter, QWidget *parent)
     : QTabWidget(parent)
     , Page(arbiter, "Vehicle", "directions_car", true, this)
 {
+    this->tabBar()->hide();
 }
 
 void VehiclePage::init()
@@ -146,11 +148,11 @@ void VehiclePage::init()
     connect(load_button, &QPushButton::clicked, [this]() { this->load_plugin(); });
     dialog->set_button(load_button);
 
-    QPushButton *settings_button = new QPushButton(this);
-    settings_button->setFlat(true);
-    this->arbiter.forge().iconize("settings", settings_button, 24);
-    connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
-    this->setCornerWidget(settings_button);
+    // QPushButton *settings_button = new QPushButton(this);
+    // settings_button->setFlat(true);
+    // this->arbiter.forge().iconize("settings", settings_button, 24);
+    // connect(settings_button, &QPushButton::clicked, [dialog]() { dialog->open(); });
+    // this->setCornerWidget(settings_button);
 
     this->load_plugin();
 }
@@ -399,14 +401,45 @@ AndroidAutoWidget::AndroidAutoWidget(QWidget *parent)
     QVBoxLayout* layout = new QVBoxLayout(this); 
     
     layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
+    layout->setContentsMargins(0,0,0,0);
 
-    directionLabel = new QLabel("Next Turn: [Direction] on [Street Name]");
+    directionLabel = new QLabel("Next Right on Koernerstrasse");
     directionLabel->setAlignment(Qt::AlignLeft);
     layout->addWidget(directionLabel);
 
-    distanceLabel = new QLabel("Distance to Next Turn: [Distance] meters");
+    distanceLabel = new QLabel("DistanceToTurn: 300 m");
     distanceLabel->setAlignment(Qt::AlignLeft);
     layout->addWidget(distanceLabel);
+
+    layout->addStretch();
+    
+    QWidget* timeWidget = new QWidget(this);
+    timeWidget->setObjectName("timeWidget");
+    timeWidget->setStyleSheet("QWidget#timeWidget { background-color: rgba(150, 255, 255, 0.9); }");
+    timeWidget->setContentsMargins(0, 0, 0, 0);
+
+    QHBoxLayout* timelayout = new QHBoxLayout(timeWidget);
+    // timelayout->setContentsMargins(8, 4, 8, 4);
+    timelayout->setSpacing(0);
+
+    QLabel* tripDurationLabel = new QLabel("34 min");
+    QLabel* tripDistanceLabel = new QLabel("12 km");
+    QLabel* etaLabel = new QLabel("14:32");
+
+    QString labelStyle = "color: black; font-weight: bold; font-size: 16px;";
+    tripDurationLabel->setStyleSheet(labelStyle);
+    tripDistanceLabel->setStyleSheet(labelStyle);
+    etaLabel->setStyleSheet(labelStyle);
+
+    tripDurationLabel->setAlignment(Qt::AlignCenter);
+    tripDistanceLabel->setAlignment(Qt::AlignCenter);
+    etaLabel->setAlignment(Qt::AlignCenter);
+
+    // Add labels with equal stretch
+    timelayout->addWidget(tripDurationLabel);
+    timelayout->addWidget(tripDistanceLabel);
+    timelayout->addWidget(etaLabel);
+    layout->addWidget(timeWidget);
 }
 
 ClimateControlsWidget::ClimateControlsWidget(QWidget *parent)

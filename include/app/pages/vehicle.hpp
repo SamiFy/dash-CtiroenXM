@@ -96,38 +96,38 @@ private:
 class ClimateControlsWidget : public FramedWidget {
     Q_OBJECT
 
-public:
-    ClimateControlsWidget(QWidget *parent = nullptr);
+    public:
+        ClimateControlsWidget(QWidget *parent = nullptr);
 
-public:
-    //PlaceHolders
-    void readTemperatures(float outsideTemp, float cabinTemp, float engineTemp);
-    void writeControls();
+    public:
+        //PlaceHolders
+        void readTemperatures(float outsideTemp, float cabinTemp, float engineTemp);
+        void writeControls();
 
-private:
-    QLabel *FanRPM;
-    QLabel *setTemp;
+    private:
+        QLabel *FanRPM;
+        QLabel *setTemp;
 };
 
 class DataTab : public QWidget {
     Q_OBJECT
 
-   public:
-    DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
+    public:
+        DataTab(Arbiter &arbiter, QWidget *parent = nullptr);
 
-   private:
-    Arbiter &arbiter;
-    QWidget *speedo_tach_widget();
-    // QWidget *mileage_data_widget();
-    QWidget *engine_data_widget();
-    QWidget *coolant_temp_widget();
-    QWidget *engine_load_widget();
+    private:
+        Arbiter &arbiter;
+        QWidget *speedo_tach_widget();
+        // QWidget *mileage_data_widget();
+        QWidget *engine_data_widget();
+        QWidget *coolant_temp_widget();
+        QWidget *engine_load_widget();
 
-    QGridLayout *gridLayout;
-    AndroidAutoWidget *androidAutoWidget;
-    ClimateControlsWidget *climateControlsWidget;
+        QGridLayout *gridLayout;
+        AndroidAutoWidget *androidAutoWidget;
+        ClimateControlsWidget *climateControlsWidget;
 
-    std::vector<Gauge *> gauges;
+        std::vector<Gauge *> gauges;
 };
 
 
