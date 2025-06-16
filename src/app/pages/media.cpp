@@ -21,8 +21,8 @@ MediaPage::MediaPage(Arbiter &arbiter, QWidget *parent)
 
 void MediaPage::init()
 {
-    this->addTab(new RadioPlayerTab(this->arbiter, this), "Radio");
     this->addTab(new BluetoothPlayerTab(this->arbiter, this), "Bluetooth");
+    this->addTab(new RadioPlayerTab(this->arbiter, this), "Radio");
     this->addTab(new LocalPlayerTab(this->arbiter, this), "Local");
 }
 

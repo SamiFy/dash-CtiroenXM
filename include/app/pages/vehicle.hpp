@@ -109,6 +109,18 @@ class ClimateControlsWidget : public FramedWidget {
         QLabel *setTemp;
 };
 
+class MediaPlayerWidget : public FramedWidget {
+    Q_OBJECT
+
+   public:
+    MediaPlayerWidget(Arbiter &arbiter, QWidget *parent = nullptr);
+
+   private:
+    Arbiter &arbiter;
+
+    QWidget *controls_widget();
+};
+
 class DataTab : public QWidget {
     Q_OBJECT
 
@@ -126,6 +138,7 @@ class DataTab : public QWidget {
         QGridLayout *gridLayout;
         AndroidAutoWidget *androidAutoWidget;
         ClimateControlsWidget *climateControlsWidget;
+        MediaPlayerWidget *mediaPlayerWidget;
 
         std::vector<Gauge *> gauges;
 };

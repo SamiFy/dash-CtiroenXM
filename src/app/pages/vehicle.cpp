@@ -1,7 +1,9 @@
 #include <QPalette>
 #include <QSerialPortInfo>
+#include <cstdio>
 #include <qboxlayout.h>
 #include <qcolor.h>
+#include <qgridlayout.h>
 #include <qicon.h>
 #include <qlabel.h>
 #include <qnamespace.h>
@@ -358,21 +360,12 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     QVBoxLayout* Drive_Layout = new QVBoxLayout(Drive_Widget); 
     
     Drive_Layout->addWidget(new QLabel("Drive"), 0, Qt::AlignCenter);
-    
-    QWidget *Player_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QVBoxLayout* Player_Layout = new QVBoxLayout(Player_Widget); 
-    
-    Player_Layout->addWidget(new QLabel("Media Player"), 0, Qt::AlignCenter);
 
+    mediaPlayerWidget = new MediaPlayerWidget(this->arbiter, this);
+    gridLayout->addWidget(mediaPlayerWidget, 0, 4, 20, 1);
 
     gridLayout->addWidget(Time_Widget, 18, 0, 2, 1);
     gridLayout->addWidget(Drive_Widget, 0, 1, 20, 3);
-    gridLayout->addWidget(Player_Widget, 0, 4, 20, 1);
-
-    // layout->setColumnStretch(0, 1);
-    // layout->setColumnStretch(1, 2);
-    // layout->setColumnStretch(2, 1);
-
 
     // --- Old DataTab layout implementation --- //
 
@@ -449,7 +442,107 @@ ClimateControlsWidget::ClimateControlsWidget(QWidget *parent)
 
     layout->addWidget(new QLabel("Climate Controls"), 0, Qt::AlignCenter);
 }
+
+MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
+    : FramedWidget(QColor(0,255,255), parent)
+    , arbiter(arbiter)
+{
+    QGridLayout *layout = new QGridLayout(this);
+
+    BluezQt::MediaPlayerPtr media_player = this->arbiter.system().bluetooth.get_media_player().second;
+    AAHandler *aa_handler = this->arbiter.android_auto().handler;
+
+    QWidget *albumArtPlaceholder = new QWidget(this);
+    albumArtPlaceholder->setStyleSheet("background-color:rgb(90, 158, 163);");
+    layout->addWidget(albumArtPlaceholder, 0, 0, 6, 1);
+    QLabel *albumArt = new QLabel(this);
+    layout->addWidget(albumArt, 0, 0, 6, 1);
+
+    QWidget *trackInfo = new QWidget(this);
+    QVBoxLayout *trackInfoLayout = new QVBoxLayout(trackInfo);
+
+    QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString("Artist"), this);
+    trackInfoLayout->addWidget(artist);
+
+    QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString("Album"), this);
+    trackInfoLayout->addWidget(album);
+
+    QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString("Title"), this);
+    trackInfoLayout->addWidget(title);
+    trackInfoLayout->addStretch();
     
+    layout->addWidget(trackInfo, 6, 0, 3, 1);
+
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::media_player_track_changed, [artist, album, title](BluezQt::MediaPlayerTrack track){
+        artist->setText(track.artist());
+        album->setText(track.album());
+        title->setText(track.title());
+    });
+    
+    connect(aa_handler, &AAHandler::aa_media_metadata_update, [artist, album, title, albumArt](const aasdk::proto::messages::MediaInfoChannelMetadataData& metadata){
+        title->setText(QString::fromStdString(metadata.track_name()));
+        if(metadata.has_artist_name()) artist->setText(QString::fromStdString(metadata.artist_name()));
+        if(metadata.has_album_name()) album->setText(QString::fromStdString(metadata.album_name()));
+        if(metadata.has_album_art()){
+            QImage art;
+            art.loadFromData(QByteArray::fromStdString(metadata.album_art()));
+            albumArt->setPixmap(QPixmap::fromImage(art));
+        }
+    });
+
+    // Controls Widget untested
+
+    QWidget *controls = new QWidget(this);
+    QHBoxLayout *controlsLayout = new QHBoxLayout(controls);
+
+    QPushButton *previous_button = new QPushButton(controls);
+    previous_button->setFlat(true);
+    this->arbiter.forge().iconize("skip_previous", previous_button, 56);
+    connect(previous_button, &QPushButton::clicked, [this]{
+        BluezQt::MediaPlayerPtr media_player = this->arbiter.system().bluetooth.get_media_player().second;
+        if (media_player != nullptr)
+            media_player->previous()->waitForFinished();
+    });
+    controlsLayout->addWidget(previous_button);
+
+    QPushButton *play_button = new QPushButton(controls);
+    play_button->setFlat(true);
+    play_button->setCheckable(true);
+    bool status = (media_player != nullptr) ? media_player->status() == BluezQt::MediaPlayer::Status::Playing : false;
+    play_button->setChecked(status);
+    this->arbiter.forge().iconize("play", "pause", play_button, 56);
+    connect(play_button, &QPushButton::clicked, [this, play_button](bool checked = false){
+        play_button->setChecked(!checked);
+
+        BluezQt::MediaPlayerPtr media_player = this->arbiter.system().bluetooth.get_media_player().second;
+        if (media_player != nullptr) {
+            if (checked)
+                media_player->play()->waitForFinished();
+            else
+                media_player->pause()->waitForFinished();
+        }
+    });
+    connect(&this->arbiter.system().bluetooth, &Bluetooth::media_player_status_changed, [play_button](BluezQt::MediaPlayer::Status status){
+        play_button->setChecked(status == BluezQt::MediaPlayer::Status::Playing);
+    });
+    controlsLayout->addWidget(play_button);
+
+    QPushButton *forward_button = new QPushButton(controls);
+    forward_button->setFlat(true);
+    this->arbiter.forge().iconize("skip_next", forward_button, 56);
+    connect(forward_button, &QPushButton::clicked, [this]{
+        BluezQt::MediaPlayerPtr media_player = this->arbiter.system().bluetooth.get_media_player().second;
+        if (media_player != nullptr)
+            media_player->next()->waitForFinished();
+    });
+    controlsLayout->addWidget(forward_button);
+
+    layout->addWidget(controls, 9, 0, 1, 1);
+}   
+
+
+
+
 
 // middle widget contains speed and tacho informaion
 QWidget *DataTab::speedo_tach_widget()
