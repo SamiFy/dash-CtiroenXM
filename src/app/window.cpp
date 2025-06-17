@@ -120,7 +120,6 @@ QWidget *Dash::status_bar() const
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
-    // Attention: Clock implemented. We just need to get the code to my layout
     auto clock = new QLabel();
     clock->setFont(this->arbiter.forge().font(10, true));
     clock->setAlignment(Qt::AlignCenter);
@@ -158,7 +157,6 @@ QWidget *Dash::control_bar() const
         quick_views->setCurrentWidget(quick_view->widget());
     });
 
-    // Stretch forces the rest of the elements to align to the right? forcing the shutdown and exit buttons to the far right
     layout->addStretch();
 
     auto dialog = new Dialog(this->arbiter, true, this->arbiter.window());
@@ -178,7 +176,6 @@ QWidget *Dash::control_bar() const
 
     widget->setVisible(this->arbiter.layout().control_bar.enabled);
 
-    // Connects the event of changing the control bar enable in the settings to the set Visble function
     connect(&this->arbiter, &Arbiter::control_bar_changed, [widget](bool enabled){
         widget->setVisible(enabled);
     });
@@ -243,14 +240,14 @@ MainWindow::MainWindow(QRect geometry)
     if (this->arbiter.layout().fullscreen.on_start)
         this->arbiter.set_fullscreen(true);
         
-    // scanlineOverlay = new QLabel(this);
-    // scanlineOverlay->setGeometry(0, 0, width(), height());
-    // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
-    // scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    // scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
-    // scanlineOverlay->setStyleSheet("background: transparent;");
-    // scanlineOverlay->setAlignment(Qt::AlignCenter);  // optional, cleaner
-    // scanlineOverlay->raise();  // important: bring it to front!
+    scanlineOverlay = new QLabel(this);
+    scanlineOverlay->setGeometry(0, 0, width(), height());
+    scanlineOverlay->setPixmap(generateScanlines(width(), height()));
+    scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
+    scanlineOverlay->setStyleSheet("background: transparent;");
+    scanlineOverlay->setAlignment(Qt::AlignCenter);  // optional, cleaner
+    scanlineOverlay->raise();  // important: bring it to front!
 }
 
 MainWindow *MainWindow::init(QRect geometry)
@@ -271,8 +268,8 @@ void MainWindow::showEvent(QShowEvent *event)
 void MainWindow::resizeEvent(QResizeEvent *event)
 {
     QMainWindow::resizeEvent(event);
-    // scanlineOverlay->setGeometry(0, 0, width(), height());
-    // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
+    scanlineOverlay->setGeometry(0, 0, width(), height());
+    scanlineOverlay->setPixmap(generateScanlines(width(), height()));
 }
 
 QPixmap MainWindow::generateScanlines(int width, int height) {

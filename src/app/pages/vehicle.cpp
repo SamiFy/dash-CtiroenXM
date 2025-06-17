@@ -350,11 +350,8 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
 
     climateControlsWidget = new ClimateControlsWidget(this);
     gridLayout->addWidget(climateControlsWidget, 9, 0, 9, 1);
-
-    QWidget *Time_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QVBoxLayout* Time_Layout = new QVBoxLayout(Time_Widget); 
     
-    Time_Layout->addWidget(new QLabel("14.05.2025  21:47"), 0, Qt::AlignCenter);
+    clockWidget = new ClockWidget(this->arbiter, this);
     
     QWidget *Drive_Widget = new FramedWidget(QColor(0, 255, 255), this);
     QVBoxLayout* Drive_Layout = new QVBoxLayout(Drive_Widget); 
@@ -364,7 +361,7 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     mediaPlayerWidget = new MediaPlayerWidget(this->arbiter, this);
     gridLayout->addWidget(mediaPlayerWidget, 0, 4, 20, 1);
 
-    gridLayout->addWidget(Time_Widget, 18, 0, 2, 1);
+    gridLayout->addWidget(clockWidget, 18, 0, 2, 1);
     gridLayout->addWidget(Drive_Widget, 0, 1, 20, 3);
 
     // --- Old DataTab layout implementation --- //
@@ -441,6 +438,34 @@ ClimateControlsWidget::ClimateControlsWidget(QWidget *parent)
     QVBoxLayout* layout = new QVBoxLayout(this);
 
     layout->addWidget(new QLabel("Climate Controls"), 0, Qt::AlignCenter);
+}
+
+ClockWidget::ClockWidget(Arbiter &arbiter, QWidget *parent)
+    : FramedWidget(QColor(0, 255, 255), parent)
+    , arbiter(arbiter)
+{
+    QHBoxLayout *layout = new QHBoxLayout(this);
+
+    auto clock = new QLabel();
+    clock->setFont(this->arbiter.forge().font(16, true));
+    clock->setAlignment(Qt::AlignLeft);
+    clock->setAlignment(Qt::AlignVCenter);
+    layout->addWidget(clock);
+
+    connect(&this->arbiter.system().clock, &Clock::ticked, [clock](QTime time){
+        clock->setText(QLocale().toString(time, QLocale::LongFormat));
+    });
+
+    QLabel *logo = new QLabel(this);
+    QPixmap pixmap("./assets/icons/citroen.svg");
+    if (!pixmap.isNull()) {
+        logo->setPixmap(pixmap.scaled(150, 30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    } else {
+        logo->setText("Logo not found");
+    }
+    logo->setAlignment(Qt::AlignRight);
+    logo->setAlignment(Qt::AlignVCenter);
+    layout->addWidget(logo);
 }
 
 MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
@@ -539,10 +564,6 @@ MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
 
     layout->addWidget(controls, 9, 0, 1, 1);
 }   
-
-
-
-
 
 // middle widget contains speed and tacho informaion
 QWidget *DataTab::speedo_tach_widget()
