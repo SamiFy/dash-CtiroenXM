@@ -13,6 +13,7 @@
 #include "obd/command.hpp"
 #include "app/widgets/selector.hpp"
 #include "app/widgets/dialog.hpp"
+#include "app/arbiter.hpp"
 
 #include "app/pages/page.hpp"
 
@@ -80,7 +81,7 @@ class AndroidAutoWidget : public FramedWidget {
     Q_OBJECT
 
 public:
-    AndroidAutoWidget(QWidget *parent = nullptr);
+    explicit AndroidAutoWidget(Arbiter &arbiter, QWidget *parent = nullptr);
 
 public:
     void updateDirection(const QString &direction, const QString &streetName);
@@ -88,6 +89,7 @@ public:
     void updateStatus(const QString &ETA, const QString remainingTime, const QString remainingDistance);
 
 private:
+    Arbiter &arbiter;
     QLabel *directionLabel;
     QLabel *distanceLabel;
     QLabel *statusLabel;

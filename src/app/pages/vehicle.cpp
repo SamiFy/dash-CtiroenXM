@@ -345,7 +345,7 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     gridLayout->setSpacing(10);
     gridLayout->setContentsMargins(10,10,10,10);
 
-    androidAutoWidget = new AndroidAutoWidget(this);
+    androidAutoWidget = new AndroidAutoWidget(this->arbiter, this);
     gridLayout->addWidget(androidAutoWidget, 0, 0, 9, 1);
 
     climateControlsWidget = new ClimateControlsWidget(this);
@@ -385,19 +385,20 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     //     gauge->start();
 }
 
-AndroidAutoWidget::AndroidAutoWidget(QWidget *parent)
+AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
     : FramedWidget(QColor(0, 255,255), parent)
+    , arbiter(arbiter)
 {
     QVBoxLayout* layout = new QVBoxLayout(this); 
     
     layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
     layout->setContentsMargins(0,0,0,0);
 
-    directionLabel = new QLabel("Next Right on Koernerstrasse");
+    directionLabel = new QLabel("---");
     directionLabel->setAlignment(Qt::AlignLeft);
     layout->addWidget(directionLabel);
 
-    distanceLabel = new QLabel("DistanceToTurn: 300 m");
+    distanceLabel = new QLabel("---");
     distanceLabel->setAlignment(Qt::AlignLeft);
     layout->addWidget(distanceLabel);
 
@@ -430,6 +431,67 @@ AndroidAutoWidget::AndroidAutoWidget(QWidget *parent)
     timelayout->addWidget(tripDistanceLabel);
     timelayout->addWidget(etaLabel);
     layout->addWidget(timeWidget);
+
+    // ==========================================================
+    // ===== ADD THIS NEW CODE TO CONNECT NAVIGATION EVENTS =====
+    // ==========================================================
+
+    // 1. Get the AAHandler from the arbiter
+    AAHandler *aa_handler = this->arbiter.android_auto().handler;
+
+    // 2. Connect the distance event (this code is still correct)
+    connect(aa_handler, &AAHandler::aa_navigation_distance_event, 
+            this, [this](const aasdk::proto::messages::NavigationDistanceEvent& event) {
+        
+        int meters = event.meters();
+        // TODO: Add logic to convert meters to feet/miles/km
+        distanceLabel->setText(QString("Distance: %1 m").arg(meters));
+    });
+
+    // 3. Connect the turn event (UPDATED with correct accessors)
+    connect(aa_handler, &AAHandler::aa_navigation_turn_event, 
+        this, [this](const aasdk::proto::messages::NavigationTurnEvent& event) {
+    
+        QString turnText = "Next: ";
+
+        // Get the maneuver type (this is an enum)
+        // You must find the enum definition to get all values.
+        int maneuverType = event.maneuvertype(); 
+        
+        // This switch is an EXAMPLE based on common navigation enums.
+        // You will need to find the real enum values in the .proto file.
+        switch(maneuverType) {
+            case 1: turnText += "Keep Straight"; break;
+            case 2: turnText += "Turn Left"; break;
+            case 3: turnText += "Turn Right"; break;
+            case 4: turnText += "U-Turn (Left)"; break;
+            case 5: turnText += "U-Turn (Right)"; break;
+            case 6: turnText += "Keep Left"; break;
+            case 7: turnText += "Keep Right"; break;
+            // ... add more cases as you find them
+            default: turnText += QString("Maneuver (%1)").arg(maneuverType);
+        }
+
+        // Get the street name
+        if (event.has_street_name()) {
+            turnText += " on " + QString::fromStdString(event.street_name());
+        }
+
+        directionLabel->setText(turnText);
+
+        // --- Pro Tip: Display the Turn Icon ---
+        // This event also includes an image. If you add a QLabel* turnIconLabel,
+        // you can display it like this:
+        /*
+        if (event.has_turnimage()) {
+            const std::string& imageData = event.turnimage();
+            QImage image;
+            if (image.loadFromData(reinterpret_cast<const uchar*>(imageData.data()), imageData.size())) {
+                turnIconLabel->setPixmap(QPixmap::fromImage(image));
+            }
+        }
+        */
+    });
 }
 
 ClimateControlsWidget::ClimateControlsWidget(QWidget *parent)
