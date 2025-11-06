@@ -93,6 +93,7 @@ private:
     Arbiter &arbiter;
     QLabel *directionLabel;
     QLabel *distanceLabel;
+    QLabel *turnIconLabel;
     QLabel *statusLabel;
 };
 
@@ -157,6 +158,16 @@ class ClockWidget : public FramedWidget {
 
 };
 
+class DriveWidget : public FramedWidget {
+    Q_OBJECT
+
+    public: 
+        DriveWidget(Arbiter &arbiter, QWidget *paremt =nullptr);
+
+    private:
+        Arbiter &arbiter;
+};
+
 class MediaPlayerWidget : public FramedWidget {
     Q_OBJECT
 
@@ -187,6 +198,7 @@ class DataTab : public QWidget {
         AndroidAutoWidget *androidAutoWidget;
         ClimateControlsWidget *climateControlsWidget;
         ClockWidget *clockWidget;
+        DriveWidget *driveWidget;
         MediaPlayerWidget *mediaPlayerWidget;
 
 

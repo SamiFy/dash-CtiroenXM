@@ -17,6 +17,18 @@
 #include "canbus/elm327.hpp"
 #include "plugins/vehicle_plugin.hpp"
 
+// --- CRITICAL STEP ---
+// You must include the headers for the proto messages
+#include "aasdk_proto/NavigationDistanceEventMessage.pb.h" // <-- Find the real path to this
+#include "aasdk_proto/NavigationTurnEventMessage.pb.h"   // <-- Find the real path to this
+
+// Register the custom types so Qt can pass them between threads.
+// This code will run once when the application loads.
+static const bool s_registeredDistance = 
+    qRegisterMetaType<aasdk::proto::messages::NavigationDistanceEvent>("aasdk::proto::messages::NavigationDistanceEvent");
+static const bool s_registeredTurn = 
+    qRegisterMetaType<aasdk::proto::messages::NavigationTurnEvent>("aasdk::proto::messages::NavigationTurnEvent");
+
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
 : QWidget(parent)
@@ -345,27 +357,24 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     gridLayout->setSpacing(10);
     gridLayout->setContentsMargins(10,10,10,10);
 
+    gridLayout->setColumnMinimumWidth(1, 1000);
+
     androidAutoWidget = new AndroidAutoWidget(this->arbiter, this);
-    gridLayout->addWidget(androidAutoWidget, 0, 0, 9, 1);
+    gridLayout->addWidget(androidAutoWidget, 0, 0, 1, 1);
 
     climateControlsWidget = new ClimateControlsWidget(this);
-    gridLayout->addWidget(climateControlsWidget, 9, 0, 9, 1);
-    
+    gridLayout->addWidget(climateControlsWidget, 1, 0, 1, 1);
+
     clockWidget = new ClockWidget(this->arbiter, this);
+    gridLayout->addWidget(clockWidget, 2, 0, 1, 1);
     
-    QWidget *Drive_Widget = new FramedWidget(QColor(0, 255, 255), this);
-    QVBoxLayout* Drive_Layout = new QVBoxLayout(Drive_Widget); 
+    driveWidget = new DriveWidget(this->arbiter, this);
+    gridLayout->addWidget(driveWidget, 0, 1, 3, 1);
     
-    Drive_Layout->addWidget(new QLabel("Drive"), 0, Qt::AlignCenter);
-
     mediaPlayerWidget = new MediaPlayerWidget(this->arbiter, this);
-    gridLayout->addWidget(mediaPlayerWidget, 0, 4, 20, 1);
-
-    gridLayout->addWidget(clockWidget, 18, 0, 2, 1);
-    gridLayout->addWidget(Drive_Widget, 0, 1, 20, 3);
+    gridLayout->addWidget(mediaPlayerWidget, 0, 2, 3, 1);
 
     // --- Old DataTab layout implementation --- //
-
     // QHBoxLayout *layout = new QHBoxLayout(this);
 
     // QWidget *driving_data = this->speedo_tach_widget();
@@ -401,6 +410,11 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
     distanceLabel = new QLabel("---");
     distanceLabel->setAlignment(Qt::AlignLeft);
     layout->addWidget(distanceLabel);
+
+    turnIconLabel = new QLabel("");
+    turnIconLabel->setAlignment(Qt::AlignLeft);
+    layout->addWidget(turnIconLabel);
+
 
     layout->addStretch();
     
@@ -494,7 +508,6 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
         // --- Pro Tip: Display the Turn Icon ---
         // This event also includes an image. If you add a QLabel* turnIconLabel,
         // you can display it like this:
-        /*
         if (event.has_turnimage()) {
             const std::string& imageData = event.turnimage();
             QImage image;
@@ -502,7 +515,6 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
                 turnIconLabel->setPixmap(QPixmap::fromImage(image));
             }
         }
-        */
     });
 }
 
@@ -728,6 +740,15 @@ ClockWidget::ClockWidget(Arbiter &arbiter, QWidget *parent)
     logo->setAlignment(Qt::AlignRight);
     logo->setAlignment(Qt::AlignVCenter);
     layout->addWidget(logo);
+}
+
+DriveWidget::DriveWidget(Arbiter &arbiter, QWidget *parent)
+    : FramedWidget(QColor(0,255,255), parent)
+    , arbiter(arbiter)
+{
+    QVBoxLayout *layout = new QVBoxLayout(this); 
+    QLabel *testLabel = new QLabel("Drive Widget");
+    layout->addWidget(testLabel);
 }
 
 MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
