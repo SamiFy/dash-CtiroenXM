@@ -9,7 +9,7 @@ FramedWidget::FramedWidget(const QColor& borderColor, QWidget* parent)
     // This applies a glow effect, which gets applied to all children as well
     this->setAttribute(Qt::WA_TranslucentBackground); // Allow transparency
     auto* glowEffect = new QGraphicsDropShadowEffect(this);
-    glowEffect->setBlurRadius(30);
+    glowEffect->setBlurRadius(100);
     glowEffect->setOffset(0, 0);
     glowEffect->setColor(m_borderColor);
 

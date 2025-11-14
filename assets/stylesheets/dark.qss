@@ -4,12 +4,12 @@ QMainWindow > QFrame {
 }
 
 QWidget {
-    outline: 0;
-    /* outline-color: #2cfff8; */
+    /* outline: 1;
+    outline-color: #2cfff8; */
 }
 
 QLabel {
-    color: #2cfff8;
+    color: #00cfa2;
     font-family: 'DS-Digital';
 }
 
@@ -25,7 +25,7 @@ QTabWidget::pane {
 
 QTabBar::tab {
     background-color: transparent;
-    color: #2cfff8;
+    color: #00cfa2;
     margin-top: 2px;
     padding: 2px;
     border-bottom: 2px solid transparent;
@@ -82,21 +82,24 @@ QSlider::sub-page[neutral="true"] {
 }
 
 QPushButton {
-    color: rgb(44, 255, 248);
-    border: none;
-    padding: 8px;
-    border-radius: 8px;
+    color: #00cfa2;
+    border: 1px solid #00cfa2;
+    border-radius: 0px;
+    background-color: #000000;
+    margin: 0px;
+    padding: 10px;
 }
 
 QPushButton:pressed {
-    background-color: rgba(255, 255, 255, 25);
+    color: #000000;
+    background-color: #00cfa2;
 }
 
 QPushButton:disabled {
     color: rgba(255, 255, 255, 128);
 }
 
-QPushButton:!flat {
+/* QPushButton:!flat {
     background-color: rgb(50, 50, 50);
 }
 
@@ -107,7 +110,7 @@ QPushButton:!flat:checked {
 
 QPushButton:!flat:disabled {
     background-color: rgb(33, 33, 33);
-}
+} */
 
 QPushButton#FullscreenBar {
     border-radius: 2px;
