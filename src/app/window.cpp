@@ -239,15 +239,6 @@ MainWindow::MainWindow(QRect geometry)
     
     if (this->arbiter.layout().fullscreen.on_start)
         this->arbiter.set_fullscreen(true);
-        
-    // scanlineOverlay = new QLabel(this);
-    // scanlineOverlay->setGeometry(0, 0, width(), height());
-    // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
-    // scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
-    // scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
-    // scanlineOverlay->setStyleSheet("background: transparent;");
-    // scanlineOverlay->setAlignment(Qt::AlignCenter);  // optional, cleaner
-    // scanlineOverlay->raise();  // important: bring it to front!
 }
 
 MainWindow *MainWindow::init(QRect geometry)
@@ -270,20 +261,6 @@ void MainWindow::resizeEvent(QResizeEvent *event)
     QMainWindow::resizeEvent(event);
     // scanlineOverlay->setGeometry(0, 0, width(), height());
     // scanlineOverlay->setPixmap(generateScanlines(width(), height()));
-}
-
-QPixmap MainWindow::generateScanlines(int width, int height) {
-    QPixmap pixmap(width, height);
-    pixmap.fill(Qt::transparent);
-    QPainter painter(&pixmap);
-    painter.setPen(QColor(0,20,50,120));
-    painter.setCompositionMode(QPainter::CompositionMode_Multiply);
-
-    for (int y = 0; y < height; y += 4)
-    {
-        painter.drawLine(0, y, width, y);
-    }
-    return pixmap;
 }
 
 void MainWindow::set_fullscreen(Page *page)

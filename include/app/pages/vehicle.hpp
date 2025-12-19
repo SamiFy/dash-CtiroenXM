@@ -25,6 +25,7 @@ class Arbiter;
 typedef std::function<double(double, bool)> obd_decoder_t;
 typedef QPair<QString, QString> units_t;
 
+QPixmap generateScanlines(int width, int height);
 class Gauge : public QWidget {
     Q_OBJECT
 
@@ -93,6 +94,7 @@ public:
 
 private:
     Arbiter &arbiter;
+    QLabel *connectLabel;
     QLabel *directionLabel;
     QLabel *distanceLabel;
     QLabel *turnIconLabel;

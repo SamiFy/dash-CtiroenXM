@@ -310,12 +310,26 @@ QWidget *CameraPage::Settings::camera_overlay_height_widget()
 QWidget *CameraPage::local_camera_widget()
 {
     QWidget *widget = new QWidget(this);
-    QVBoxLayout *layout = new QVBoxLayout(widget);
+    
+    // 1. Use QGridLayout instead of QVBoxLayout to allow stacking
+    QGridLayout *layout = new QGridLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
 
+    // 2. Create the Video Widget (The Background Layer)
+    this->local_video_widget = new CameraPage::VideoContainer(widget, this);
+    
+    // Add video to Row 0, Column 0
+    layout->addWidget(this->local_video_widget, 0, 0);
+
+    // 3. Create the Disconnect Button (The Foreground Layer)
     QPushButton *disconnect = new QPushButton(widget);
     disconnect->setFlat(true);
+    
+    // Make the button invisible (transparent background) but keep the icon visible
+    disconnect->setStyleSheet("QPushButton { background-color: transparent; border: none; }");
+    disconnect->setCursor(Qt::PointingHandCursor); // Change cursor to hand to indicate interactability
+
     connect(disconnect, &QPushButton::clicked, [this]{
         this->status->setText(QString());
         emit autoconnect_disabled();
@@ -323,11 +337,12 @@ QWidget *CameraPage::local_camera_widget()
         this->local_cam = nullptr;
     });
     this->arbiter.forge().iconize("close", disconnect, 16);
-    layout->addWidget(disconnect, 0, Qt::AlignRight);
 
-    this->local_video_widget = new CameraPage::VideoContainer(widget, this);
-
-    layout->addWidget(this->local_video_widget);
+    // 4. Add Button to Row 0, Column 0, but align it Top-Right
+    layout->addWidget(disconnect, 0, 0, Qt::AlignTop | Qt::AlignRight);
+    
+    // Ensure button stays on top of the video
+    disconnect->raise();
 
     return widget;
 }
@@ -581,13 +596,29 @@ void CameraPage::connect_local_stream()
     this->local_cam->load();
     qDebug() << "camera status: " << this->local_cam->status();
 
-    QSize res = this->choose_video_resolution();
+    QSize res = this->choose_video_resolution(); // Assuming this returns 1920x1080
+
+    // Math for the crop (assuming 16:9 input)
+    int targetW = 1600;
+    int targetH = 600;
+    int intermediateH = 900; // 1600x900 maintains 16:9 aspect ratio
+    int cropTop = (intermediateH - targetH) / 2; // 150
+    int cropBottom = cropTop;
 
     DASH_LOG(info) << "[CameraPage] Creating GStreamer pipeline with " << this->config->get_cam_local_device().toStdString();
+    
     std::string pipeline = "v4l2src device=" + this->config->get_cam_local_device().toStdString() +
-                        //    " ! image/jpeg, width=480, height=320, framerate=30/1 ! jpegdec ! decodebin";
-                           " ! capsfilter caps=\"video/x-raw,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + ";image/jpeg,width=" + std::to_string(res.width()) + ",height=" + std::to_string(res.height()) + "\"" +
-                           " ! decodebin";
+                           // 1. Force the Camera's NATIVE resolution (don't force 1600x600 here!)
+                           " ! image/jpeg,width=" + std::to_string(2560) + ",height=" + std::to_string(1440) + ",framerate=30/1" +
+                           " ! decodebin" +
+                           // 2. Scale down to 1600x900 (Maintains Aspect Ratio)
+                           " ! videoscale" + 
+                           " ! video/x-raw,width=" + std::to_string(targetW) + ",height=" + std::to_string(intermediateH) + 
+                           // 3. Crop 150px from top and bottom to get 1600x600
+                           " ! videobox top=" + std::to_string(cropTop) + " bottom=" + std::to_string(cropBottom) + 
+                           // 4. Final verification caps
+                           " ! video/x-raw,width=" + std::to_string(targetW) + ",height=" + std::to_string(targetH);
+
     init_gstreamer_pipeline(pipeline);
     //emit the connected signal before we resize anything, so that videoContainer has had time to resize to the proper dimensions
     emit connected_local();

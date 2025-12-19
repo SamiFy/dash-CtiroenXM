@@ -4,31 +4,32 @@ QMainWindow > QFrame {
 }
 
 QWidget {
-    /* outline: 1;
-    outline-color: #2cfff8; */
+    border:none;
 }
 
 QLabel {
-    color: #00cfa2;
+    color: palette(base);
     font-family: 'DS-Digital';
 }
 
 QLabel:disabled {
-    color: rgba(44, 255, 248, 128);
+    opacity: 50;
+    color: palette(base);
 }
 
 QTabWidget::pane {
     background-color: transparent;
     border: none;
-    border-top: 2px solid rgb(7, 80, 77);
+    border-top: 2px solid;
+    border-color: palette(base);
 }
 
 QTabBar::tab {
     background-color: transparent;
-    color: #00cfa2;
+    color: palette(base);
     margin-top: 2px;
     padding: 2px;
-    border-bottom: 2px solid transparent;
+    border-bottom: 2px solid;
 }
 
 QTabBar::tab:selected:top {
@@ -48,13 +49,13 @@ QSlider {
 }
 
 QSlider::groove {
-    background-color: palette(alternate-base);
+    background-color: palette(base);
     height: 5px;
     border-radius: 2px;
 }
 
 QSlider::groove[neutral="true"] {
-    background-color: rgba(224, 224, 224, 128);
+    background-color: palette(base);
 }
 
 QSlider::handle {
@@ -68,7 +69,7 @@ QSlider::handle {
 }
 
 QSlider::handle[neutral="true"] {
-    background-color: rgb(224, 224, 224);
+    background-color: palette(base);
 }
 
 QSlider::sub-page {
@@ -78,25 +79,28 @@ QSlider::sub-page {
 }
 
 QSlider::sub-page[neutral="true"] {
-    background-color: rgb(224, 224, 224);
+    background-color: palette(base);
 }
 
 QPushButton {
-    color: #00cfa2;
-    border: 1px solid #00cfa2;
+    color: palette(base);
+    width: 50px;
+    height: 50px;
+    border: 1px solid palette(base);
     border-radius: 0px;
-    background-color: #000000;
+    background-color: transparent;
     margin: 0px;
     padding: 10px;
 }
 
 QPushButton:pressed {
     color: #000000;
-    background-color: #00cfa2;
+    background-color: palette(base);
 }
 
 QPushButton:disabled {
-    color: rgba(255, 255, 255, 128);
+    color: palette(base);
+    opacity: 50;
 }
 
 /* QPushButton:!flat {
@@ -111,11 +115,6 @@ QPushButton:!flat:checked {
 QPushButton:!flat:disabled {
     background-color: rgb(33, 33, 33);
 } */
-
-QPushButton#FullscreenBar {
-    border-radius: 2px;
-    margin: 2px;
-}
 
 QFrame[frameShape="4"][frameShadow="16"],
 QFrame[frameShape="5"][frameShadow="16"] {
@@ -152,17 +151,18 @@ QGroupBox {
 }
 
 QCheckBox {
-    color: #2cfff8;
+    color: palette(base);
     background-color: transparent;
 }
 
 QRadioButton {
-    color: #2cfff8;
+    color: palette(base);
     background-color: transparent;
 }
 
 QRadioButton:disabled {
-    color: #064946;
+    color: palette(base);
+    opacity: 50;
 }
 
 QCheckBox::indicator {
@@ -289,6 +289,10 @@ VehicleState {
     qproperty-warning_color: #FF7043;
 }
 
+timeWidget {
+    background-color: palette(base);
+}
+
 QDialog,
 QDialog > QFrame {
     background-color: #000000;
@@ -298,17 +302,17 @@ QDialog > QFrame {
 
 #ControlBar {
     background-color: #000000;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    /* border-top-left-radius: 6px; */
+    /* border-top-right-radius: 6px; */
 }
 
 #StatusBar {
     background-color: #000000;
-    border-top-left-radius: 4px;
+    /* border-top-left-radius: 4px;
     border-top-right-radius: 4px;
     border-bottom-left-radius: 4px;
-    border-bottom-right-radius: 4px;
-    margin: 2px;
+    border-bottom-right-radius: 4px; */
+    /* margin: 2px; */
 }
 
 *[add_hint="true"] {

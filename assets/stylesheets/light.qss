@@ -3,10 +3,6 @@ QMainWindow > QFrame {
     background-color: rgb(238, 238, 238);
 }
 
-QWidget {
-    outline: 0;
-}
-
 QLabel {
     color: rgba(0, 0, 0, 222);
 }

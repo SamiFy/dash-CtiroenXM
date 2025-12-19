@@ -460,15 +460,11 @@ QWidget *OpenAutoPage::connect_msg()
     QLabel *label = new QLabel("Connect Device to Start Android Auto", widget);
     label->setAlignment(Qt::AlignCenter);
 
-    blur = new QGraphicsBlurEffect();
-    blur->setBlurRadius(20);
-    label->setGraphicsEffect(blur);
-
     // Apply glow effect
     glow = new QGraphicsDropShadowEffect();
     glow->setBlurRadius(100);
     glow->setOffset(0, 0);
-    glow->setColor(QColor(0, 255, 255, 255));
+    glow->setColor(QColor(0, 255, 0, 255));
 
     label->setGraphicsEffect(glow);
 

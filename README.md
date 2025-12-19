@@ -30,12 +30,26 @@ Main features of Dash include:
 
 # TODO V1.0:
 
+- [ ] Frontend: Fix lag caused by glow - find alternative or remove glow :(
+- [ ] Backend: Connect media player controls to Android Auto
+    - Note: It seems like it would only work over bluetooth. Test on RPI5
+- [x] Frontend: Fix album cover size and track info styles
+- [ ] Feature: Implement Steering Wheel buttons
+    - [ ] Backend: Setup ESP32 Comms over UART/USB
+    - [ ] Connect ESP32 Master device over USB
+    - [ ] Connect Buttons line from steering wheel to ESP32 and parse to RPI5
+- [ ] Feature: Automatic power on / off
+    - [ ] Hardware: Get min. 50W power input from nearest always on source
+        - [ ] Find nearest source
+    - [ ] Hardware: Detect acc power on the ESP32
+    - [ ] Hardware: Implement Relay switch for power control
+    - [ ] Backend: Implement soft shutdown
+
 - [ ] Backend: Analyze CAN receive functions
-- [ ] Backend: Setup ESP32 Comms over UART/USB
-- [ ] Frontend: Improve global theming for a single color config
-- [ ] Fix: Disable scan lines in the AA page when it's active
-- [ ] Fix: Disable cursor by default on RPI5
-- [ ] Fix: Fix Camera resolution
+- [x] Frontend: Improve global theming for a single color config
+- [x] Fix: Disable scan lines in the AA page when it's active
+- [x] Fix: Disable cursor by default on RPI5
+- [x] Fix: Fix Camera resolution
 - [ ] Enhancement: Create Car driving animation
     - [ ] Get Car rear view SVG or png
     - [ ] Create while loop function, that moves the png or body element of the svg up and down

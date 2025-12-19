@@ -1,8 +1,10 @@
+#include <AAHandler.hpp>
 #include <QPalette>
 #include <QSerialPortInfo>
 #include <cstdio>
 #include <qboxlayout.h>
 #include <qcolor.h>
+#include <qdebug.h>
 #include <qgridlayout.h>
 #include <qicon.h>
 #include <qlabel.h>
@@ -28,6 +30,21 @@ static const bool s_registeredDistance =
     qRegisterMetaType<aasdk::proto::messages::NavigationDistanceEvent>("aasdk::proto::messages::NavigationDistanceEvent");
 static const bool s_registeredTurn = 
     qRegisterMetaType<aasdk::proto::messages::NavigationTurnEvent>("aasdk::proto::messages::NavigationTurnEvent");
+
+
+QPixmap generateScanlines(int width, int height) {
+    QPixmap pixmap(width, height);
+    pixmap.fill(Qt::transparent);
+    QPainter painter(&pixmap);
+    painter.setPen(QColor(0,0,0,40));
+    painter.setCompositionMode(QPainter::CompositionMode_Multiply);
+
+    for (int y = 0; y < height; y += 3)
+    {
+        painter.drawLine(0, y, width, y);
+    }
+    return pixmap;
+}
 
 Gauge::Gauge(units_t units, QFont value_font, QFont unit_font, Gauge::Orientation orientation, int rate,
              std::vector<Command> cmds, int precision, obd_decoder_t decoder, QWidget *parent)
@@ -138,6 +155,15 @@ void VehiclePage::init()
 {
     this->addTab(new DataTab(this->arbiter, this), "Data");
     this->config = Config::get_instance();
+
+    QLabel* scanlineOverlay = new QLabel(this);
+    scanlineOverlay->setGeometry(0, 0, 1600, 600);
+    scanlineOverlay->setPixmap(generateScanlines(1600, 600));
+    scanlineOverlay->setAttribute(Qt::WA_TransparentForMouseEvents);
+    scanlineOverlay->setAttribute(Qt::WA_TranslucentBackground);
+    scanlineOverlay->setStyleSheet("background: transparent;");
+    scanlineOverlay->setAlignment(Qt::AlignCenter);
+    scanlineOverlay->raise();
 
     for (auto device : QCanBus::instance()->availableDevices("socketcan"))
         this->can_devices.append(device.name());
@@ -353,6 +379,10 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
     : QWidget(parent)
     , arbiter(arbiter)
 {
+    // ThemeAwareGlow* glow = new ThemeAwareGlow(this);
+    // glow->setBlurRadius(100);
+    // this->setGraphicsEffect(glow);
+
     gridLayout = new QGridLayout(this);
     gridLayout->setSpacing(10);
     gridLayout->setContentsMargins(10,10,10,10);
@@ -395,36 +425,49 @@ DataTab::DataTab(Arbiter &arbiter, QWidget *parent)
 }
 
 AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
-    : FramedWidget(QColor(0, 255,255), parent)
+    : FramedWidget(parent)
     , arbiter(arbiter)
 {
-    QVBoxLayout* layout = new QVBoxLayout(this); 
+    QVBoxLayout* androidAutoWidget_layout = new QVBoxLayout(this); 
+    androidAutoWidget_layout->setContentsMargins(0,0,0,0);
+    this->setMinimumWidth(350);
+    this->setMaximumWidth(351);
+
+    connectLabel = new QLabel("Navigation inactive. Please connect your phone and select a destination.");
+    connectLabel->setWordWrap(true);
+    connectLabel->setAlignment(Qt::AlignCenter);
+    connectLabel->setStyleSheet("padding: 10px");
+    androidAutoWidget_layout->addWidget(connectLabel);
     
-    layout->addWidget(new QLabel("Android Auto"), 0, Qt::AlignCenter);
-    layout->setContentsMargins(0,0,0,0);
-
-    directionLabel = new QLabel("---");
+    QHBoxLayout* nextCommand_layout = new QHBoxLayout(this);
+    
+    directionLabel = new QLabel("");
+    directionLabel->setWordWrap(true);
     directionLabel->setAlignment(Qt::AlignLeft);
-    layout->addWidget(directionLabel);
+    directionLabel->setStyleSheet("padding: 10px");
+    nextCommand_layout->addWidget(directionLabel);
+    
+    distanceLabel = new QLabel("");
+    distanceLabel->setAlignment(Qt::AlignRight);
+    distanceLabel->setStyleSheet("padding: 10px");
+    nextCommand_layout->addWidget(distanceLabel);
 
-    distanceLabel = new QLabel("---");
-    distanceLabel->setAlignment(Qt::AlignLeft);
-    layout->addWidget(distanceLabel);
+    androidAutoWidget_layout->addLayout(nextCommand_layout);
 
     turnIconLabel = new QLabel("");
-    turnIconLabel->setAlignment(Qt::AlignLeft);
-    layout->addWidget(turnIconLabel);
+    turnIconLabel->setAlignment(Qt::AlignRight);
+    turnIconLabel->setScaledContents(true);
+    turnIconLabel->setFixedSize(64, 64);
+    androidAutoWidget_layout->addWidget(turnIconLabel);
 
-
-    layout->addStretch();
+    androidAutoWidget_layout->addStretch();
     
     QWidget* timeWidget = new QWidget(this);
     timeWidget->setObjectName("timeWidget");
-    timeWidget->setStyleSheet("QWidget#timeWidget { background-color: rgba(150, 255, 255, 0.9); }");
+    timeWidget->setStyleSheet("QWidget#timeWidget { background-color: palette(base); }");
     timeWidget->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* timelayout = new QHBoxLayout(timeWidget);
-    // timelayout->setContentsMargins(8, 4, 8, 4);
     timelayout->setSpacing(0);
 
     QLabel* tripDurationLabel = new QLabel("34 min");
@@ -444,29 +487,27 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
     timelayout->addWidget(tripDurationLabel);
     timelayout->addWidget(tripDistanceLabel);
     timelayout->addWidget(etaLabel);
-    layout->addWidget(timeWidget);
+    androidAutoWidget_layout->addWidget(timeWidget);
 
-    // ==========================================================
-    // ===== ADD THIS NEW CODE TO CONNECT NAVIGATION EVENTS =====
-    // ==========================================================
-
-    // 1. Get the AAHandler from the arbiter
     AAHandler *aa_handler = this->arbiter.android_auto().handler;
 
-    // 2. Connect the distance event (this code is still correct)
+
     connect(aa_handler, &AAHandler::aa_navigation_distance_event, 
             this, [this](const aasdk::proto::messages::NavigationDistanceEvent& event) {
         
         int meters = event.meters();
-        // TODO: Add logic to convert meters to feet/miles/km
-        distanceLabel->setText(QString("Distance: %1 m").arg(meters));
+        if(meters > 1500) {
+            meters /= 1000;
+            distanceLabel->setText(QString("%1 km").arg(meters));
+        } else {
+            distanceLabel->setText(QString("%1 m").arg(meters));
+        }
     });
 
-    // 3. Connect the turn event (UPDATED with correct accessors)
     connect(aa_handler, &AAHandler::aa_navigation_turn_event, 
         this, [this](const aasdk::proto::messages::NavigationTurnEvent& event) {
     
-        QString turnText = "Next: ";
+        QString turnText = "";
 
         // ! Reference from NavigationTurnEventMessage.proto
         /*
@@ -505,9 +546,12 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
 
         directionLabel->setText(turnText);
 
-        // --- Pro Tip: Display the Turn Icon ---
-        // This event also includes an image. If you add a QLabel* turnIconLabel,
-        // you can display it like this:
+        if (!turnText.isEmpty()) {
+            connectLabel->setVisible(false);
+        } else {
+            connectLabel->setVisible(true);
+        }
+
         if (event.has_turnimage()) {
             const std::string& imageData = event.turnimage();
             QImage image;
@@ -519,35 +563,40 @@ AndroidAutoWidget::AndroidAutoWidget(Arbiter &arbiter, QWidget *parent)
 }
 
 ClockWidget::ClockWidget(Arbiter &arbiter, QWidget *parent)
-    : FramedWidget(QColor(0, 255, 255), parent)
+    : FramedWidget(parent)
     , arbiter(arbiter)
 {
     QHBoxLayout *layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0,0,0,0);
+    this->setMinimumWidth(350);
+    this->setMaximumWidth(351);
 
     auto clock = new QLabel();
-    clock->setFont(this->arbiter.forge().font(16, true));
+    clock->setFont(this->arbiter.forge().font(26, true));
     clock->setAlignment(Qt::AlignLeft);
     clock->setAlignment(Qt::AlignVCenter);
+    clock->setStyleSheet("padding: 10px;");
     layout->addWidget(clock);
 
     connect(&this->arbiter.system().clock, &Clock::ticked, [clock](QTime time){
         clock->setText(QLocale().toString(time, QLocale::LongFormat));
     });
 
+    layout->addStretch(1);
+
     QLabel *logo = new QLabel(this);
-    QPixmap pixmap("./assets/icons/citroen.svg");
+    QPixmap pixmap("./assets/icons/Citroen-Icon.svg");
     if (!pixmap.isNull()) {
-        logo->setPixmap(pixmap.scaled(150, 30, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+        logo->setPixmap(pixmap.scaled(60, 60, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     } else {
         logo->setText("Logo not found");
     }
-    logo->setAlignment(Qt::AlignRight);
-    logo->setAlignment(Qt::AlignVCenter);
+    logo->setAlignment(Qt::AlignCenter);
     layout->addWidget(logo);
 }
 
 MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
-    : FramedWidget(QColor(0,255,255), parent)
+    : FramedWidget(parent)
     , arbiter(arbiter)
 {
     QGridLayout *layout = new QGridLayout(this);
@@ -556,22 +605,29 @@ MediaPlayerWidget::MediaPlayerWidget(Arbiter &arbiter, QWidget *parent)
     AAHandler *aa_handler = this->arbiter.android_auto().handler;
 
     QWidget *albumArtPlaceholder = new QWidget(this);
-    albumArtPlaceholder->setStyleSheet("background-color:rgb(90, 158, 163);");
+    albumArtPlaceholder->setStyleSheet("background-color:palette(base);");
     layout->addWidget(albumArtPlaceholder, 0, 0, 6, 1);
     QLabel *albumArt = new QLabel(this);
+    albumArt->setScaledContents(true); 
+    albumArt->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     layout->addWidget(albumArt, 0, 0, 6, 1);
 
     QWidget *trackInfo = new QWidget(this);
     QVBoxLayout *trackInfoLayout = new QVBoxLayout(trackInfo);
 
+    QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString("Title"), this);
+    title->setWordWrap(true);
+    title->setStyleSheet("font-size: 24px;");
+    trackInfoLayout->addWidget(title);
     QLabel *artist = new QLabel((media_player != nullptr) ? media_player->track().artist() : QString("Artist"), this);
+    artist->setWordWrap(true);
+    artist->setStyleSheet("font-size: 16px;");
     trackInfoLayout->addWidget(artist);
-
     QLabel *album = new QLabel((media_player != nullptr) ? media_player->track().album() : QString("Album"), this);
+    album->setWordWrap(true);
+    album->setStyleSheet("font-size: 16px;");
     trackInfoLayout->addWidget(album);
 
-    QLabel *title = new QLabel((media_player != nullptr) ? media_player->track().title() : QString("Title"), this);
-    trackInfoLayout->addWidget(title);
     trackInfoLayout->addStretch();
     
     layout->addWidget(trackInfo, 6, 0, 3, 1);
@@ -718,7 +774,7 @@ QWidget *DataTab::speedo_tach_widget()
 QWidget *DataTab::engine_data_widget()
 {
     QWidget *widget = new QWidget(this);
-    // FramedWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
+    // FramedWidget *widget = new FramedWidget(this);
     // QVBoxLayout *layout = new QVBoxLayout(widget);
     auto* layout = new QGridLayout();
     layout->setContentsMargins(0, 0, 0, 0);
@@ -744,7 +800,7 @@ QWidget *DataTab::engine_data_widget()
 
 QWidget *DataTab::coolant_temp_widget()
 {
-    QWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
+    QWidget *widget = new FramedWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
@@ -775,7 +831,7 @@ QWidget *DataTab::coolant_temp_widget()
 QWidget *DataTab::engine_load_widget()
 {
     // QWidget *widget = new QWidget(this);
-    QWidget *widget = new FramedWidget(QColor(0, 255, 255), this);
+    QWidget *widget = new FramedWidget(this);
     QVBoxLayout *layout = new QVBoxLayout(widget);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);

@@ -113,8 +113,6 @@ class OpenAutoPage : public QStackedWidget, public Page {
     
     QWidget *connect_msg();
     QGraphicsDropShadowEffect *glow;
-    QGraphicsBlurEffect *blur;
-    // QGraphicsDropShadowEffect *glow2;
 
     Config *config;
     OpenAutoFrame *frame;

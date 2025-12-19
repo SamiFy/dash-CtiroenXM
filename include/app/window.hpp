@@ -69,9 +69,6 @@ class MainWindow : public QMainWindow {
     private:
         Arbiter arbiter;
         QStackedWidget *stack;
-        QLabel *scanlineOverlay;
-
-        QPixmap generateScanlines(int width, int height);
 
         MainWindow *init(QRect geometry);
 };
